@@ -15,7 +15,8 @@
         hideDone: $('.done-task-hide'),
         addButton: $('#butAdd'),
         addInput: $('#inpAdd'),
-        toggleDoneTasks: $('#inpHid')
+        toggleDoneTasks: $('#inpHid'),
+        header: $('.header')
     };
 
     app.toggleDoneTasks.change(() => {
@@ -52,6 +53,25 @@
         }
     });
 
+    if (!navigator.onLine) {
+        updateNetworkStatus();
+    }
+
+    window.addEventListener('online', updateNetworkStatus, false);
+    window.addEventListener('offline', updateNetworkStatus, false);
+
+    //To update network status
+    function updateNetworkStatus() {
+        if (navigator.onLine) {
+            app.header.removeClass('offline');
+            app.spinner.attr('hidden', true);
+        }
+        else {
+            app.header.addClass('offline');
+            app.spinner.removeAttr('hidden');
+        }
+    }
+
     /*****************************************************************************
     *
     * Methods to update/refresh the UI
@@ -71,6 +91,9 @@
             if (data.done) {
                 task = app.doneTaskTemplate.clone(true);
                 task.find('.task-name').text(data.label);
+                if (data.important) {
+                    task.find('.task-important-image').addClass('task-important-image-checked');
+                }
                 task.removeClass('done-task-template');
                 task.find('.task-checkbox input').one('change', (event) => {
                     setTimeout(() => {

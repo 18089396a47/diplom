@@ -9,6 +9,7 @@ var filesToCache = [
   '/images/ic_add_white_36px.svg',
   '/images/ic_refresh_white_36px.svg',
   '/images/star.svg',
+  '/images/offline.svg',
   '/manifest.json'
 ];
 

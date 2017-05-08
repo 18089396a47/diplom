@@ -49,6 +49,26 @@ body {
     -webkit-transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s;
   z-index: 1000;
 }
+  .header.offline .image {
+    display: block;
+    position: absolute;
+    top: 10px;
+    right: 70px;
+    width: 40px;
+    height: 40px;
+    background: url(/images/offline.svg) no-repeat;
+  }
+    .header .image:hover::after {
+      content: attr(data-title);
+      position: absolute;
+      left: -25px;
+      background: #FFF;
+      bottom: -40px;
+      border-radius: 5px;
+      border: 1px solid #3F51B5;
+      color: #444;
+      padding: 2px 5px;
+    }
   .header .headerButton {
     width: 36px;
     height: 36px;
@@ -95,10 +115,10 @@ body {
     flex-grow: 1;
     font-size: 20px;
     height: 46px;
-    outline-color: #5A3;
     padding: 0 10px;
-    border: 1px solid #3F51B5;
+    outline-color: #5A3;
     border-radius: 5px;
+    border: 1px solid #3F51B5;
     box-shadow: 0px 2px 2px 0px #a9a9a9;
   }
   .add-new-button {
@@ -252,6 +272,7 @@ body {
     border: 1px solid #3F51B5;
     border-radius: 5px;
     background: #F7F7F7;
+    opacity: 0.8;
     height: 46px;
     display: flex;
     align-items: center;
@@ -263,6 +284,12 @@ body {
     text-decoration: line-through;
     text-decoration-color: #3F51B5;
   }
+    .done-task .task-important {
+      cursor: auto;
+    }
+    .done-task .task-important-image-checked {
+      background-color: #DB4C3F;
+    }
   .done-task-template {
     display: none;
   }
