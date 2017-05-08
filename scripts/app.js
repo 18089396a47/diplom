@@ -197,7 +197,7 @@
       caches.match(url).then(function(response) {
         if (response) {
           response.json().then(function updateFromCache(json) {
-            var results = json.query.results;
+            var results = json.query.results || {};
             results.key = key;
             results.label = label;
             results.done = done;
@@ -214,7 +214,7 @@
       if (request.readyState === XMLHttpRequest.DONE) {
         if (request.status === 200) {
           var response = JSON.parse(request.response);
-          var results = response.query.results;
+          var results = response.query.results || {};
           results.key = key;
           results.label = label;
           results.done = done;
