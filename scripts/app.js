@@ -64,11 +64,9 @@
     function updateNetworkStatus() {
         if (navigator.onLine) {
             app.header.removeClass('offline');
-            app.spinner.attr('hidden', true);
         }
         else {
             app.header.addClass('offline');
-            app.spinner.removeAttr('hidden');
         }
     }
 
@@ -140,7 +138,6 @@
                         });
                         app.saveTasks();
                         app.checkDoneTasks();
-                        // app.updateTask(app.tasks[taskIndex]);
                     }, 300);
                 });
                 task.find('.task-important input').change(() => {

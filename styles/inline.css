@@ -46,18 +46,21 @@ body {
   align-items: center;
   align-content: center;
   transition: transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s,
-    -webkit-transform 0.233s cubic-bezier(0, 0, 0.21, 1) 0.1s;
+    background-color 0.3s;
   z-index: 1000;
 }
-  .header.offline .image {
-    display: block;
-    position: absolute;
-    top: 10px;
-    right: 70px;
-    width: 40px;
-    height: 40px;
-    background: url(/images/offline.svg) no-repeat;
+  .header.offline {
+    background-color: #6B6B6B;
   }
+    .header.offline .image {
+      display: block;
+      position: absolute;
+      top: 10px;
+      right: 70px;
+      width: 40px;
+      height: 40px;
+      background: url(/images/offline.svg) no-repeat;
+    }
     .header .image:hover::after {
       content: attr(data-title);
       position: absolute;
