@@ -68,6 +68,7 @@
         app.tasks.push(newTask);
         app.updateTask(newTask);
         app.saveTasks();
+        app.sync();
     }
 
     app.addButton.click(app.addTask);
@@ -77,7 +78,7 @@
         }
     });
 
-    app.refreshButton.click(app.sync);
+    app.refreshButton.click(()=>{app.sync();document.location.reload();});
 
     if (!navigator.onLine) {
         updateNetworkStatus();
@@ -133,6 +134,7 @@
                             task.slideUp(150, () => {
                                 task.remove();
                                 app.updateTask(app.tasks[taskIndex]);
+                                app.sync();
                             });
                         });
                         app.saveTasks();
@@ -162,6 +164,7 @@
                             task.slideUp(150, () => {
                                 task.remove();
                                 app.updateTask(app.tasks[taskIndex]);
+                                app.sync();
                             });
                         });
                         app.saveTasks();
@@ -173,6 +176,7 @@
                     app.tasks[taskIndex].important = !app.tasks[taskIndex].important;
                     app.tasks[taskIndex].last_updated = new Date().toISOString();
                     app.saveTasks();
+                    app.sync();
                     console.log(app.tasks, taskIndex);
                 });
                 task.removeAttr('hidden');
