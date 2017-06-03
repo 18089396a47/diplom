@@ -76,7 +76,7 @@
 
     app.selectRange = function(range = 4) {
         app.visibleCards = new Map();
-        app.taskContainer.empty();
+        app.taskContainer.html('<li class="task-empty">Нет задач...</li><li class="task task-template" hidden><div class="task-last-updated" hidden></div><label class="task-checkbox"><input type="checkbox"><div class="task-checkbox-image"></div></label><h2 class="task-name"></h2><label class="task-important"><input type="checkbox"><div class="task-important-image"></div></label><h3 class="task-limit"></h3></li>');
         let tasks, date;
         switch (range) {
             case 1:
