@@ -17,7 +17,10 @@
         addInput: $('#inpAdd'),
         toggleDoneTasks: $('#inpHid'),
         header: $('.header'),
-        refreshButton: $('#butRefresh')
+        refreshButton: $('#butRefresh'),
+        menuButton: $('.header .menu'),
+        nav: $('.nav'),
+        overlay: $('.overlay')
     };
 
     app.toggleDoneTasks.change(() => {
@@ -71,12 +74,48 @@
         app.sync();
     }
 
+    app.selectRange = function(range = 4) {
+        app.visibleCards = new Map();
+        app.taskContainer.empty();
+        let tasks, date;
+        switch (range) {
+            case 1:
+                date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 1);
+                break;
+            case 2:
+                date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 2);
+                break;
+            case 3:
+                date = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() + 7);
+                break;
+            default:
+                date = new Date(2050, 0);
+                break;
+        }
+        tasks = app.tasks.filter(item => item.date_limitation && new Date(item.date_limitation) < date || !item.date_limitation);
+        tasks.forEach(task => app.updateTask(task));
+        $(document.body).removeClass('open');
+        $('.selected').removeClass('selected');
+        app.nav.find(`li:nth-child(${range})`).addClass('selected');
+    }
+
     app.addButton.click(app.addTask);
     app.addInput.keypress((event) => {
         if (event.which === 13) {
             app.addTask();
         }
     });
+
+    app.menuButton.click(() => {
+        $(document.body).toggleClass('open');
+    });
+    app.overlay.click(() => {
+        $(document.body).toggleClass('open');
+    });
+    app.nav.find('li:nth-child(1)').click(app.selectRange.bind(null, 1));
+    app.nav.find('li:nth-child(2)').click(app.selectRange.bind(null, 2));
+    app.nav.find('li:nth-child(3)').click(app.selectRange.bind(null, 3));
+    app.nav.find('li:nth-child(4)').click(app.selectRange.bind(null, 4));
 
     app.refreshButton.click(()=>{app.sync();document.location.reload();});
 
@@ -119,6 +158,9 @@
                 if (data.important) {
                     task.find('.task-important-image').addClass('task-important-image-checked');
                 }
+                if (data.date_limitation) {
+                    task.find('.task-limit').text(new Date(data.date_limitation).toLocaleString());
+                }
                 task.removeClass('done-task-template');
                 task.find('.task-checkbox input').one('change', (event) => {
                     setTimeout(() => {
@@ -149,6 +191,9 @@
                 task.removeClass('task-template');
                 if (data.important) {
                     task.find('.task-important input').attr('checked', true);
+                }
+                if (data.date_limitation) {
+                    task.find('.task-limit').text(new Date(data.date_limitation).toLocaleString());
                 }
                 task.find('.task-checkbox input').one('change', (event) => {
                     setTimeout(() => {
@@ -198,6 +243,12 @@
             }
         }
         taskLastUpdatedElem.text(data.last_updated);
+        if (data.important) {
+            task.find('.task-important input').attr('checked', true);
+        }
+        if (data.date_limitation) {
+            task.find('.task-limit').text(new Date(data.date_limitation).toLocaleString());
+        }
 
         if (app.isLoading) {
             app.spinner.attr('hidden', true);
@@ -232,11 +283,11 @@
         app.tasks = resultTasks;
     };
 
-  /*****************************************************************************
-   *
-   * Methods for dealing with the model
-   *
-   ****************************************************************************/
+   /****************************************************************************
+    *
+    * Methods for dealing with the model
+    *
+    ***************************************************************************/
 
   app.getTasks = function(tasks) {
     var url = '/data/';
@@ -339,6 +390,7 @@
         app.tasks = [];
         app.saveTasks();
     }
+    app.selectRange();
     app.sync();
     app.checkDoneTasks();
 })();

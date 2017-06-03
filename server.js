@@ -39,7 +39,7 @@ router.post('/data', loggedIn, function(req, res, next) {
             req.user.tasks.push(newTask);
         }
     });
-    User.findByIdAndUpdate(req.user._id,{
+    User.findByIdAndUpdate(req.user._id, {
         $set: {
             tasks: req.user.tasks
         }
@@ -48,13 +48,7 @@ router.post('/data', loggedIn, function(req, res, next) {
             next(err);
         }
         res.sendStatus(200);
-    })
-    // req.user.save((err) => {
-    //     if (err) {
-    //         next(err);
-    //     }
-    //     res.sendStatus(200);
-    // });
+    });
 });
 
 router.post('/login', passport.authenticate('local'), function(req, res){

@@ -49,9 +49,14 @@ body {
     background-color 0.3s;
   z-index: 1000;
 }
+  .header .
   .header.offline {
     background-color: #6B6B6B;
   }
+    .header .menu {
+      margin-right: 15px;
+      cursor: pointer;
+    }
     .header.offline .image {
       display: block;
       position: absolute;
@@ -166,6 +171,12 @@ body {
     padding: 0 10px;
     margin-bottom: 10px;
     transform-origin: top;
+  }
+  .task-limit {
+    position: absolute;
+    margin: 15px 30px;
+    font-size: 12px;
+    color: #3F51B5;
   }
   .task-template {
     display: none;
@@ -312,7 +323,7 @@ body {
   padding: 10px;
   background: #3F51B5;
   display: inline-block;
-  color: #fff;
+  color: #FFF;
   width: 260px;
   text-align: center;
 }
@@ -329,6 +340,57 @@ body {
   transform-origin: 50%;
   animation: line 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite, rotate 1.6s linear infinite;
 }
+
+.nav {
+  background: #FFF;
+  border-right: 1px solid #3F51B5;
+  position: fixed;
+  left: 0;
+  top: 56px;
+  bottom: 0;
+  transition: transform 150ms ease-in-out,
+    -webkit-transform 150ms ease-in-out;
+  width: 240px;
+  z-index: 20;
+  transform: translateX(-240px);
+}
+  .open .nav {
+    transform: translate(0);
+  }
+  .nav ul {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .nav li {
+    border-bottom: 1px solid #3F51B5;
+    padding: 10px 15px;
+    cursor: pointer;
+  }
+    .nav li.selected {
+      background: #DDD;
+    }
+    .nav li:last-child {
+      border-bottom: 0;
+      border-top: 1px solid #3F51B5;
+      margin-top: auto;
+    }
+
+.overlay {
+  display: none;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  top: 56px;
+  bottom: 0;
+  z-index: 10;
+  background: #000;
+  opacity: 0;
+}
+  .open .overlay {
+    display: block;
+    opacity: 0.5;
+  }
 
 @keyframes rotate {
   from {

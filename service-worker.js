@@ -11,6 +11,7 @@ var filesToCache = [
   '/images/ic_refresh_white_36px.svg',
   '/images/star.svg',
   '/images/offline.svg',
+  '/images/menu.svg',
   '/manifest.json'
 ];
 
