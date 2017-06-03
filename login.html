@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Login</title>
+    <script>
+        if (document.cookie.indexOf('au') !== -1) {
+            window.location = '/';
+        }
+    </script>
+</head>
+<body>
+    <form action="/login" method="post" novalidate>
+        <div>
+            <label>Email:</label>
+            <input type="email" name="username">
+        </div>
+        <div>
+            <label>Password:</label>
+            <input type="password" name="password">
+        </div>
+        <div>
+            <input type="submit" value="Log In">
+        </div>
+    </form>
+    <script src="scripts/jquery-3.2.1.min.js"></script>
+    <script>
+        $('form').submit((e) => {
+            e.preventDefault();
+            $.post(`/login?username=${$('input[name=username]').val()}&password=${$('input[name=password]').val()}`)
+                .done((res) => {
+                    window.location = '/';
+                });
+        });
+    </script>
+</body>
+</html>

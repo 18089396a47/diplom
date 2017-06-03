@@ -16,7 +16,8 @@
         addButton: $('#butAdd'),
         addInput: $('#inpAdd'),
         toggleDoneTasks: $('#inpHid'),
-        header: $('.header')
+        header: $('.header'),
+        refreshButton: $('#butRefresh')
     };
 
     app.toggleDoneTasks.change(() => {
@@ -24,6 +25,29 @@
         app.hideDone.toggle();
         app.doneTaskList.toggle(300);
     });
+
+    app.sync = function() {
+        const url = '/data/';
+        $.post({
+            url,
+            data: `{"tasks": ${JSON.stringify(app.tasks)}}`,
+            contentType: 'application/json',
+        })
+            .fail(redirect);
+        console.log(app.tasks);
+        $.get(url).done((response) => {
+            var results = response || [];
+            results.forEach(task => app.updateTask(task));
+            app.mergeTasks(results);
+            app.saveTasks();
+
+            if (app.isLoading) {
+                app.spinner.attr('hidden', true);
+                app.taskContainer.removeAttr('hidden');
+                app.isLoading = false;
+            }
+        }).fail(redirect);
+    }
 
     app.addTask = () => {
         const value = app.addInput.val().trim();
@@ -36,7 +60,7 @@
             important: false,
             key: (~~(Math.random() * 1.e5)).toString(),
             label: value,
-            created: new Date().toISOString()
+            last_updated: new Date().toISOString()
         };
         console.log(newTask);
         app.addInput.val('');
@@ -52,6 +76,8 @@
             app.addTask();
         }
     });
+
+    app.refreshButton.click(app.sync);
 
     if (!navigator.onLine) {
         updateNetworkStatus();
@@ -82,7 +108,7 @@
         if (!data) {
             return;
         }
-        var dataLastUpdated = new Date(data.created);
+        var dataLastUpdated = new Date(data.last_updated);
 
         var task = app.visibleCards.get(data.key);
         if (!task) {
@@ -98,6 +124,7 @@
                         const taskIndex = app.tasks.findIndex(element => element.key === data.key);
                         console.log(app.tasks, app.visibleCards);
                         app.tasks[taskIndex].done = false;
+                        app.tasks[taskIndex].last_updated = new Date().toISOString();
                         app.visibleCards.delete(data.key);
                         console.log(app.tasks, app.visibleCards);
                         task.animate({
@@ -126,6 +153,7 @@
                         const taskIndex = app.tasks.findIndex(element => element.key === data.key);
                         console.log(app.tasks, app.visibleCards);
                         app.tasks[taskIndex].done = true;
+                        app.tasks[taskIndex].last_updated = new Date().toISOString();
                         app.visibleCards.delete(data.key);
                         console.log(app.tasks, app.visibleCards);
                         task.animate({
@@ -143,6 +171,7 @@
                 task.find('.task-important input').change(() => {
                     const taskIndex = app.tasks.findIndex(element => element.key === data.key);
                     app.tasks[taskIndex].important = !app.tasks[taskIndex].important;
+                    app.tasks[taskIndex].last_updated = new Date().toISOString();
                     app.saveTasks();
                     console.log(app.tasks, taskIndex);
                 });
@@ -164,7 +193,7 @@
                 return;
             }
         }
-        taskLastUpdatedElem.text(data.created);
+        taskLastUpdatedElem.text(data.last_updated);
 
         if (app.isLoading) {
             app.spinner.attr('hidden', true);
@@ -184,29 +213,29 @@
         }
     };
 
+    app.mergeTasks = (newTasks) => {
+        const resultTasks = [];
+        for (const task of app.tasks) {
+            const newTask = newTasks.find(item => item.key === task.key);
+            const last_updated = new Date(task.last_updated);
+            resultTasks.push(newTask && new Date(newTask.last_updated) > last_updated ? newTask : task);
+        }
+        for (const newTask of newTasks) {
+            if (!app.tasks.some(item => item.key === newTask.key)) {
+                resultTasks.push(newTask);
+            }
+        }
+        app.tasks = resultTasks;
+    };
+
   /*****************************************************************************
    *
    * Methods for dealing with the model
    *
    ****************************************************************************/
 
-
-  /*
-   * Gets a forecast for a specific city and updates the task with the data.
-   * getForecast() first checks if the weather data is in the cache. If so,
-   * then it gets that data and populates the task with the cached data.
-   * Then, getForecast() goes to the network for fresh data. If the network
-   * request goes through, then the task gets updated a second time with the
-   * freshest data.
-   */
-  app.getForecast = function(task) {
-    const key = task.key;
-    const label = task.label;
-    const done = task.done;
-    const important = task.important;
-    var statement = 'select * from weather.forecast where woeid=' + key;
-    var url = 'https://query.yahooapis.com/v1/public/yql?format=json&q=' +
-        statement;
+  app.getTasks = function(tasks) {
+    var url = '/data/';
     // TODO add cache logic here
     if ('caches' in window) {
       /*
@@ -217,47 +246,40 @@
       caches.match(url).then(function(response) {
         if (response) {
           response.json().then(function updateFromCache(json) {
-            var results = json.query.results || {};
-            results.key = key;
-            results.label = label;
-            results.done = done;
-            results.important = important;
-            results.created = json.query.created;
-            app.updateTask(results);
+            var results = json || tasks;
+            results.forEach(task => app.updateTask(task));
+            app.mergeTasks(results);
+            app.saveTasks();
+
+            if (app.isLoading) {
+                app.spinner.attr('hidden', true);
+                app.taskContainer.removeAttr('hidden');
+                app.isLoading = false;
+            }
           });
         }
       });
     }
     // Fetch the latest data.
-    var request = new XMLHttpRequest();
-    request.onreadystatechange = function() {
-      if (request.readyState === XMLHttpRequest.DONE) {
-        if (request.status === 200) {
-          var response = JSON.parse(request.response);
-          var results = response.query.results || {};
-          results.key = key;
-          results.label = label;
-          results.done = done;
-          results.important = important;
-          results.created = response.query.created;
-          app.updateTask(results);
-        }
-      } else {
-        // Return the initial weather forecast since no data is available.
-        // app.updateTask(initialTask);
-      }
-    };
-    request.open('GET', url);
-    request.send();
-  };
+    $.get(url).done((response) => {
+        var results = response || [];
+        results.forEach(task => app.updateTask(task));
+        app.mergeTasks(results);
+        app.saveTasks();
 
-  // Iterate all of the tasks and attempt to get the latest forecast data
-  app.updateForecasts = function() {
-    var keys = Object.keys(app.visibleCards);
-    keys.forEach(function(key) {
-      app.getForecast(key);
-    });
+        if (app.isLoading) {
+            app.spinner.attr('hidden', true);
+            app.taskContainer.removeAttr('hidden');
+            app.isLoading = false;
+        }
+    }).fail(redirect);
   };
+    function redirect(response) {
+        if (response.status === 401) {
+            document.cookie = 'au=;expires=Thu, 01 Jan 1970 00:00:00 GMT';
+            window.location = '/login';
+        }
+    }
 
     // TODO add saveTasks function here
     // Save list of cities to localStorage.
@@ -276,7 +298,7 @@
         important: false,
         key: '12345',
         label: 'Just do it!!!',
-        created: '2016-07-22T01:00:00Z'
+        last_updated: '2016-07-22T01:00:00Z'
     };
   // TODO uncomment line below to test app with fake data
   // app.updateTask(initialTask);
@@ -301,7 +323,7 @@
             app.tasks = [];
         }
         try {
-            app.tasks.forEach(task => app.getForecast(task));
+            app.getTasks(app.tasks);
         } catch(e) {}
     } else {
         /* The user is using the app for the first time, or the user has not
@@ -309,9 +331,10 @@
         * scenario could guess the user's location via IP lookup and then inject
         * that data into the page.
         */
-        app.updateTask(initialTask);
-        app.tasks = [initialTask];
+        // app.updateTask(initialTask);
+        app.tasks = [];
         app.saveTasks();
     }
+    app.sync();
     app.checkDoneTasks();
 })();

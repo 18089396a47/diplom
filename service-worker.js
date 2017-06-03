@@ -3,6 +3,7 @@ var cacheName = 'TODO-PWA-v1';
 var filesToCache = [
   '/',
   '/index.html',
+  '/login.html',
   '/scripts/jquery-3.2.1.min.js',
   '/scripts/app.js',
   '/styles/inline.css',
@@ -54,7 +55,7 @@ self.addEventListener('activate', function(e) {
 
 self.addEventListener('fetch', function(e) {
   console.log('[Service Worker] Fetch', e.request.url);
-  var dataUrl = 'https://query.yahooapis.com/v1/public/yql';
+  var dataUrl = '/data/';
   if (e.request.url.indexOf(dataUrl) > -1) {
     /*
      * When the request URL contains dataUrl, the app is asking for fresh
