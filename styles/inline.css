@@ -348,11 +348,13 @@ body {
   left: 0;
   top: 56px;
   bottom: 0;
-  transition: transform 150ms ease-in-out,
-    -webkit-transform 150ms ease-in-out;
+  transition: transform 150ms ease-in-out;
   width: 240px;
   z-index: 20;
   transform: translateX(-240px);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
   .open .nav {
     transform: translate(0);
