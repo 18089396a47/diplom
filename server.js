@@ -63,7 +63,7 @@ router.post('/register', function(req, res, next) {
     User.create({
         first_name: req.query.first_name,
         last_name: req.query.last_name,
-        email: req.query.username.toLowerCase(),
+        username: req.query.username.toLowerCase(),
         password: req.query.password
     }, function (err, user) {
         console.log(err, user);
@@ -98,7 +98,7 @@ app.use(express.static(__dirname));
 
 passport.use(new LocalStrategy(
   function(username, password, done) {
-    User.findOne({ email: username }, function (err, user) {
+    User.findOne({ username: username }, function (err, user) {
       if (err) { return done(err); }
       if (!user) { return done(null, false); }
       if (user.password !== password) { return done(null, false); }

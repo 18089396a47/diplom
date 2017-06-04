@@ -12,7 +12,7 @@ var userSchema = new Schema({
         type: String,
         required: true
     },
-    email: {
+    username: {
         type: String,
         unique: true,
         required: true
@@ -35,5 +35,6 @@ var userSchema = new Schema({
 
 userSchema.plugin(passportLocalMongoose);
 var user = connection.model('user', userSchema);
+user.ensureIndexes();
 
 module.exports = user;
