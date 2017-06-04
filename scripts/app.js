@@ -20,7 +20,8 @@
         refreshButton: $('#butRefresh'),
         menuButton: $('.header .menu'),
         nav: $('.nav'),
-        overlay: $('.overlay')
+        overlay: $('.overlay'),
+        about: $('.about')
     };
 
     app.toggleDoneTasks.change(() => {
@@ -43,6 +44,8 @@
             results.forEach(task => app.updateTask(task));
             app.mergeTasks(results);
             app.saveTasks();
+            const currentRange = $('.nav .selected').index() + 1;
+            app.selectRange(currentRange);
 
             if (app.isLoading) {
                 app.spinner.attr('hidden', true);
@@ -76,7 +79,7 @@
 
     app.selectRange = function(range = 4) {
         app.visibleCards = new Map();
-        app.taskContainer.html('<li class="task-empty">Нет задач...</li><li class="task task-template" hidden><div class="task-last-updated" hidden></div><label class="task-checkbox"><input type="checkbox"><div class="task-checkbox-image"></div></label><h2 class="task-name"></h2><label class="task-important"><input type="checkbox"><div class="task-important-image"></div></label><h3 class="task-limit"></h3></li>');
+        app.taskContainer.html('<li class="task-empty">Нет задач...</li><li class="task task-template" hidden><div class="task-last-updated" hidden></div><label class="task-checkbox"><input type="checkbox"><div class="task-checkbox-image"></div></label><label style="line-height:0;flex:1"><h2 class="task-name"></h2><input type="text" class="task-date"></label><label class="task-important"><input type="checkbox"><div class="task-important-image"></div></label><h3 class="task-limit"></h3></li>');
         let tasks, date;
         switch (range) {
             case 1:
@@ -116,6 +119,9 @@
     app.nav.find('li:nth-child(2)').click(app.selectRange.bind(null, 2));
     app.nav.find('li:nth-child(3)').click(app.selectRange.bind(null, 3));
     app.nav.find('li:nth-child(4)').click(app.selectRange.bind(null, 4));
+    app.nav.find('li:nth-child(5)').click(() => {app.about.show();$(document.body).removeClass('open');});
+
+    app.about.find('.cross').click((e)=>{e.stopPropagation();e.preventDefault();app.about.hide()});
 
     app.refreshButton.click(()=>{app.sync();document.location.reload();});
 
@@ -247,8 +253,22 @@
             task.find('.task-important input').attr('checked', true);
         }
         if (data.date_limitation) {
-            task.find('.task-limit').text(new Date(data.date_limitation).toLocaleString());
+            task.find('.task-limit').text(new Date(data.date_limitation).getDate() + '.' + (new Date(data.date_limitation).getMonth() + 1) + '.' + new Date(data.date_limitation).getFullYear());
         }
+        task.find('.task-date').datepicker({
+            defaultDate: data.date_limitation && new Date(data.date_limitation),
+            onClose: (text) => {
+                if (text) {
+                    console.log(text);
+                    const taskIndex = app.tasks.findIndex(element => element.key === data.key);
+                    app.tasks[taskIndex].date_limitation = new Date(text).toISOString();
+                    app.tasks[taskIndex].last_updated = new Date().toISOString();
+                    task.find('.task-limit').text(new Date(text).getDate() + '.' + (new Date(text).getMonth() + 1) + '.' + new Date(text).getFullYear());
+                    app.saveTasks();
+                    app.sync();
+                }
+            }
+        });
 
         if (app.isLoading) {
             app.spinner.attr('hidden', true);

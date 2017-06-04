@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TODO PWA</title>
     <link rel="stylesheet" type="text/css" href="styles/inline.css">
+    <link rel="stylesheet" type="text/css" href="styles/jquery-ui.min.css">
 
     <link rel="manifest" href="/manifest.json">
     <!-- Add to home screen for Safari on iOS -->
@@ -55,7 +56,10 @@
                     <input type="checkbox">
                     <div class="task-checkbox-image"></div>
                 </label>
-                <h2 class="task-name"></h2>
+                <label style="line-height:0;flex:1">
+                    <h2 class="task-name"></h2>
+                    <input type="text" class="task-date">
+                </label>
                 <label class="task-important">
                     <input type="checkbox">
                     <div class="task-important-image"></div>
@@ -94,7 +98,13 @@
       </svg>
     </div>
     <div class="overlay"></div>
+    <div class="about">
+        <h2>О приложении<div class="cross"></div></h2>
+        <p>Данное приложение является дипломной работой Грушевского А.А.</p>
+        <p>Не предназначено для коммерческого использования.</p>
+    </div>
     <script src="scripts/jquery-3.2.1.min.js"></script>
+    <script src="scripts/jquery-ui.min.js"></script>
     <script src="scripts/app.js" async></script>
     <script>
         window.onload = () => {
