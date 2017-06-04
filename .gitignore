@@ -1,1 +1,7 @@
 node_modules
+*.pdf
+*.docx
+*.doc
+*.pptx
+*.ppt
+your-first-pwapp-master
