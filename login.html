@@ -5,6 +5,63 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Login</title>
+    <style>
+        body {
+            font-family: 'Helvetica', 'Verdana', sans-serif;
+        }
+        .form {
+            box-shadow: 0 0 2px 2px #CCC;
+        }
+        .choice {
+            display: flex;
+            height: 30px;
+            align-items: stretch;
+            margin-bottom: 20px;
+        }
+            .choice .login,
+            .choice .register {
+                text-align: center;
+                flex-grow: 1;
+                border-bottom: 1px solid #CCC;
+                cursor: pointer;
+                transition: color 150ms;
+                line-height: 30px;
+            }
+            .choice .selected {
+                color: #3F51B5;
+                font-weight: bold;
+            }
+        form {
+            padding: 0 10px;
+            text-align: center;
+        }
+        form div {
+            display: flex;
+            margin-bottom: 10px;
+            text-align: left;
+            align-items: center;
+        }
+        form label {
+            width: 85px;
+        }
+        form input {
+            flex-grow: 1;
+            border: 1px solid #CCC;
+            padding: 5px;
+        }
+        form input[type=submit] {
+            width: 100px;
+            height: 30px;
+            background: #3F51B5;
+            color: #FFF;
+            line-height: 20px;
+            border: 0;
+            margin: 20px;
+        }
+        form.register {
+            display: none;
+        }
+    </style>
     <script>
         if (document.cookie.indexOf('au') !== -1) {
             window.location = '/';
@@ -12,27 +69,79 @@
     </script>
 </head>
 <body>
-    <form action="/login" method="post" novalidate>
-        <div>
-            <label>Email:</label>
-            <input type="email" name="username">
+    <h1>TODO-PWA</h1>
+    <div class="form">
+        <div class="choice">
+            <div class="login selected">Login</div>
+            <div class="register">Register</div>
         </div>
-        <div>
-            <label>Password:</label>
-            <input type="password" name="password">
-        </div>
-        <div>
+        <form class="login" action="/login" method="post">
+            <div>
+                <label>Email:</label>
+                <input type="email" name="username">
+            </div>
+            <div>
+                <label>Password:</label>
+                <input type="password" name="password">
+            </div>
             <input type="submit" value="Log In">
-        </div>
-    </form>
+        </form>
+        <form autocomplete="off" class="register" action="/register" method="post">
+            <div>
+                <label>First Name:</label>
+                <input type="text" name="first_name" autocomplete="off">
+            </div>
+            <div>
+                <label>Last Name:</label>
+                <input type="text" name="last_name" autocomplete="off">
+            </div>
+            <div>
+                <label>Email:</label>
+                <input type="email" name="username" autocomplete="off">
+            </div>
+            <div>
+                <label>Password:</label>
+                <input type="password" name="password" autocomplete="off">
+            </div>
+            <input type="submit" value="Register">
+        </form>
+    </div>
     <script src="scripts/jquery-3.2.1.min.js"></script>
     <script>
-        $('form').submit((e) => {
+        $('form.login').submit((e) => {
             e.preventDefault();
-            $.post(`/login?username=${$('input[name=username]').val()}&password=${$('input[name=password]').val()}`)
+            $.post(`/login?username=${$('.login input[name=username]').val()}&password=${$('.login input[name=password]').val()}`)
                 .done((res) => {
                     window.location = '/';
                 });
+        });
+        $('form.register').submit((e) => {
+            e.preventDefault();
+            const username = $('.register input[name=username]').val().trim();
+            const password = $('.register input[name=password]').val().trim();
+            const first_name = $('.register input[name=first_name]').val().trim();
+            const last_name = $('.register input[name=last_name]').val().trim();
+            if (username && password && first_name && last_name) {
+                $.post(`/register?username=${username}&password=${password}&first_name=${first_name}&last_name=${last_name}`)
+                    .done((res) => {
+                        localStorage.clear();
+                        window.location = '/';
+                    });
+            } else {
+                $('form.register').css({border: '1px solid red'});
+            }
+        });
+        $('.choice .login').click((e) => {
+            $('form.register').hide();
+            $('form.login').show();
+            $('.selected').removeClass('selected');
+            $('.choice .login').addClass('selected');
+        });
+        $('.choice .register').click((e) => {
+            $('form.login').hide();
+            $('form.register').show();
+            $('.selected').removeClass('selected');
+            $('.choice .register').addClass('selected');
         });
     </script>
 </body>

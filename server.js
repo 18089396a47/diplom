@@ -51,7 +51,32 @@ router.post('/data', loggedIn, function(req, res, next) {
     });
 });
 
-router.post('/login', passport.authenticate('local'), function(req, res){
+router.post('/login', passport.authenticate('local'), function(req, res) {
+    var randomNumber = Math.random().toString();
+    randomNumber = randomNumber.substring(2, randomNumber.length);
+    res.cookie('au', randomNumber, {});
+    res.sendStatus(200);
+});
+
+router.post('/register', function(req, res, next) {
+    console.log(req.query);
+    User.create({
+        first_name: req.query.first_name,
+        last_name: req.query.last_name,
+        email: req.query.username.toLowerCase(),
+        password: req.query.password
+    }, function (err, user) {
+        console.log(err, user);
+        if(err) {
+            return next(err);
+        }
+        if(!user) {
+            err = new Error("User creation failed.");
+            return next(err);
+        }
+        next();
+    });
+}, passport.authenticate('local'), function(req, res) {
     var randomNumber = Math.random().toString();
     randomNumber = randomNumber.substring(2, randomNumber.length);
     res.cookie('au', randomNumber, {});
